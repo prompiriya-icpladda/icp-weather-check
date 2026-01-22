@@ -48,21 +48,21 @@ export const PM25Indicator = ({ value, delay = 0 }: PM25IndicatorProps) => {
 
   return (
     <div
-      className="stat-card opacity-0 animate-slide-up"
+      className="stat-card opacity-0 animate-slide-up h-full flex flex-col justify-center"
       style={{ animationDelay: `${delay}ms` }}
     >
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className={cn("p-3 rounded-xl", getColorClass())}>
-            <Wind className="w-6 h-6" />
+      <div className="flex items-start justify-between mb-6">
+        <div className="flex items-center gap-4">
+          <div className={cn("p-4 rounded-2xl", getColorClass())}>
+            <Wind className="w-10 h-10" />
           </div>
-          <span className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+          <span className="text-lg font-medium text-muted-foreground uppercase tracking-wide">
             ฝุ่น PM 2.5
           </span>
         </div>
         <div
           className={cn(
-            "px-3 py-1 rounded-full text-xs font-semibold text-primary-foreground",
+            "px-4 py-2 rounded-full text-sm font-semibold text-primary-foreground",
             getBadgeColor()
           )}
         >
@@ -70,21 +70,21 @@ export const PM25Indicator = ({ value, delay = 0 }: PM25IndicatorProps) => {
         </div>
       </div>
 
-      <div className="space-y-4">
-        <div className="flex items-baseline gap-2">
-          <span className="text-5xl font-bold tracking-tight text-foreground">
+      <div className="space-y-5">
+        <div className="flex items-baseline gap-3">
+          <span className="text-7xl md:text-8xl font-bold tracking-tight text-foreground">
             {value.toFixed(1)}
           </span>
-          <span className="text-2xl font-medium text-muted-foreground">
+          <span className="text-4xl font-medium text-muted-foreground">
             μg/m³
           </span>
         </div>
 
-        <p className="text-sm text-muted-foreground">{description}</p>
+        <p className="text-lg text-muted-foreground">{description}</p>
 
         {/* Progress bar */}
-        <div className="space-y-2">
-          <div className="h-3 w-full bg-muted rounded-full overflow-hidden">
+        <div className="space-y-3">
+          <div className="h-4 w-full bg-muted rounded-full overflow-hidden">
             <div
               className={cn(
                 "h-full rounded-full transition-all duration-1000 ease-out",
@@ -93,7 +93,7 @@ export const PM25Indicator = ({ value, delay = 0 }: PM25IndicatorProps) => {
               style={{ width: `${getProgressWidth()}%` }}
             />
           </div>
-          <div className="flex justify-between text-xs text-muted-foreground">
+          <div className="flex justify-between text-sm text-muted-foreground">
             <span>0</span>
             <span>50</span>
             <span>100</span>
