@@ -53,25 +53,25 @@ export const WeatherStatus = ({ temp, humidity, delay = 0 }: WeatherStatusProps)
 
   return (
     <div
-      className="stat-card opacity-0 animate-slide-up"
+      className="stat-card opacity-0 animate-slide-up h-full flex flex-col justify-center"
       style={{ animationDelay: `${delay}ms` }}
     >
-      <div className="flex items-center gap-4 mb-4">
-        <div className={cn("p-4 rounded-2xl", weather.bgClass)}>
-          <WeatherIcon className="w-10 h-10 animate-float" />
+      <div className="flex items-center gap-6 mb-6">
+        <div className={cn("p-6 rounded-3xl", weather.bgClass)}>
+          <WeatherIcon className="w-16 h-16 animate-float" />
         </div>
         <div>
-          <h3 className="text-2xl font-bold text-foreground">{weather.label}</h3>
-          <p className="text-sm text-muted-foreground">{weather.description}</p>
+          <h3 className="text-4xl md:text-5xl font-bold text-foreground">{weather.label}</h3>
+          <p className="text-lg text-muted-foreground mt-1">{weather.description}</p>
         </div>
       </div>
 
-      <div className="flex items-center gap-2 pt-4 border-t border-border">
-        <Thermometer className={cn("w-5 h-5", tempStatus.color)} />
-        <span className={cn("text-sm font-medium", tempStatus.color)}>
+      <div className="flex items-center gap-3 pt-6 border-t border-border">
+        <Thermometer className={cn("w-8 h-8", tempStatus.color)} />
+        <span className={cn("text-xl font-medium", tempStatus.color)}>
           {tempStatus.label}
         </span>
-        <span className="text-sm text-muted-foreground">
+        <span className="text-xl text-muted-foreground">
           — อุณหภูมิ {temp.toFixed(1)}°C
         </span>
       </div>
