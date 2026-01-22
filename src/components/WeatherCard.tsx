@@ -37,7 +37,7 @@ export const WeatherCard = ({
           <div className={cn("p-4 rounded-2xl bg-muted/50", iconColor)}>
             <Icon className="w-10 h-10" />
           </div>
-          <span className="text-lg font-medium text-muted-foreground uppercase tracking-wide">
+          <span className="text-2xl md:text-3xl font-semibold text-muted-foreground uppercase tracking-wide">
             {title}
           </span>
         </div>

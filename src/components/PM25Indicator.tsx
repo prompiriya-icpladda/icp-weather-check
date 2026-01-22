@@ -56,7 +56,7 @@ export const PM25Indicator = ({ value, delay = 0 }: PM25IndicatorProps) => {
           <div className={cn("p-4 rounded-2xl", getColorClass())}>
             <Wind className="w-10 h-10" />
           </div>
-          <span className="text-lg font-medium text-muted-foreground uppercase tracking-wide">
+          <span className="text-2xl md:text-3xl font-semibold text-muted-foreground uppercase tracking-wide">
             ฝุ่น PM 2.5
           </span>
         </div>
