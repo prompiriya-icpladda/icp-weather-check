@@ -54,23 +54,24 @@ export const DateTimeDisplay = ({ lastUpdate, humidity, isLoading }: DateTimeDis
           </div>
         </div>
 
-        {lastUpdate && (
+        {(lastUpdate || typeof humidity === "number") && (
           <div className="px-5 py-4 rounded-2xl bg-muted/50 backdrop-blur-sm">
-            <div className="flex items-center gap-3">
-              <RefreshCw className={cn(
-                "w-6 h-6 text-primary",
-                isLoading && "animate-spin"
-              )} />
-              <span className="text-xl text-muted-foreground">
-                อัพเดทล่าสุด: <span className="font-semibold text-foreground">{format(lastUpdate, "HH:mm:ss")}</span>
-              </span>
-            </div>
+            {lastUpdate && (
+              <div className="flex items-center gap-3">
+                <RefreshCw
+                  className={cn("w-6 h-6 text-primary", isLoading && "animate-spin")}
+                />
+                <span className="text-xl text-muted-foreground">
+                  อัพเดทล่าสุด: <span className="font-semibold text-foreground">{format(lastUpdate, "HH:mm:ss")}</span>
+                </span>
+              </div>
+            )}
 
             {typeof humidity === "number" && (
-              <div className="flex items-center gap-3 mt-2 pl-9">
+              <div className={cn("flex items-center gap-3", lastUpdate ? "mt-2 pl-9" : "") }>
                 <Droplets className="w-6 h-6 text-primary" />
                 <span className="text-xl text-muted-foreground">
-                  ความชื้น: <span className="font-semibold text-foreground">{humidity.toFixed(1)}%</span>
+                  ความชื้นสัมพัทธ์: <span className="font-semibold text-foreground">{humidity.toFixed(1)}%</span>
                 </span>
               </div>
             )}
