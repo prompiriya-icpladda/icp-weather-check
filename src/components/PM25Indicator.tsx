@@ -87,7 +87,7 @@ export const PM25Indicator = ({ value, delay = 0 }: PM25IndicatorProps) => {
             <div className={cn("p-4 rounded-2xl transition-all duration-300", getColorClass())}>
               <Wind className="w-12 h-12 animate-pulse-soft" />
             </div>
-            <span className="text-2xl md:text-3xl font-semibold text-muted-foreground uppercase tracking-wide">
+             <span className="text-3xl md:text-4xl font-semibold text-muted-foreground uppercase tracking-wide">
               ฝุ่น PM 2.5
             </span>
           </div>
@@ -104,8 +104,8 @@ export const PM25Indicator = ({ value, delay = 0 }: PM25IndicatorProps) => {
 
         <div className="space-y-5">
           <div className="flex items-baseline gap-3">
-            <span className={cn(
-              "text-7xl md:text-8xl font-bold tracking-tight",
+             <span className={cn(
+               "text-8xl md:text-9xl font-bold tracking-tight",
               color === "weather-pm-good" ? "text-weather-pm-good" :
               color === "weather-pm-moderate" ? "text-weather-pm-moderate" :
               color === "weather-pm-unhealthy" ? "text-weather-pm-unhealthy" :
@@ -114,12 +114,12 @@ export const PM25Indicator = ({ value, delay = 0 }: PM25IndicatorProps) => {
             )}>
               {value.toFixed(1)}
             </span>
-            <span className="text-4xl font-medium text-muted-foreground">
+             <span className="text-5xl font-medium text-muted-foreground">
               μg/m³
             </span>
           </div>
 
-          <p className="text-xl text-muted-foreground">{description}</p>
+           <p className="text-2xl text-muted-foreground">{description}</p>
 
           {/* Enhanced Progress bar */}
           <div className="space-y-3">
