@@ -1,4 +1,4 @@
-import { Thermometer, Droplets } from "lucide-react";
+import { Thermometer } from "lucide-react";
 import { useWeatherData } from "@/hooks/useWeatherData";
 import { DateTimeDisplay } from "@/components/DateTimeDisplay";
 import { WeatherCard } from "@/components/WeatherCard";
@@ -30,17 +30,18 @@ const Index = () => {
       <div className="mb-6">
         <DateTimeDisplay
           lastUpdate={weatherData?.lastUpdate}
+          humidity={weatherData?.currentHumidity}
           isLoading={isLoading}
         />
       </div>
 
-      {/* Main Content - 2x2 Grid */}
+      {/* Main Content - 3 Cards */}
       <div className="flex-1 min-h-0">
         {isLoading ? (
           <LoadingSkeleton />
         ) : (
           weatherData && (
-            <div className="grid grid-cols-2 grid-rows-2 gap-6 h-full">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-full">
               <WeatherStatus
                 temp={weatherData.currentTemp}
                 humidity={weatherData.currentHumidity}
@@ -57,17 +58,7 @@ const Index = () => {
                 delay={300}
               />
 
-              <WeatherCard
-                title="ความชื้น"
-                value={weatherData.currentHumidity}
-                unit="%"
-                icon={Droplets}
-                iconColor="text-weather-humidity"
-                description="ความชื้นสัมพัทธ์"
-                delay={400}
-              />
-
-              <PM25Indicator value={weatherData.currentPM25} delay={500} />
+              <PM25Indicator value={weatherData.currentPM25} delay={400} />
             </div>
           )
         )}
@@ -77,8 +68,8 @@ const Index = () => {
 };
 
 const LoadingSkeleton = () => (
-  <div className="grid grid-cols-2 grid-rows-2 gap-6 h-full">
-    {[...Array(4)].map((_, i) => (
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-full">
+    {[...Array(3)].map((_, i) => (
       <div key={i} className="stat-card flex flex-col justify-center">
         <Skeleton className="h-8 w-32 mb-4" />
         <Skeleton className="h-16 w-48 mb-2" />

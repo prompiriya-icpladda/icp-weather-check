@@ -73,20 +73,20 @@ export const WeatherStatus = ({ temp, humidity, delay = 0 }: WeatherStatusProps)
           </div>
           <div>
             <div className="flex items-center gap-3">
-              <h3 className="text-5xl md:text-6xl font-bold text-foreground">{weather.label}</h3>
+              <h3 className="text-6xl md:text-7xl font-bold text-foreground">{weather.label}</h3>
               <Sparkles className="w-8 h-8 text-accent animate-pulse-soft" />
             </div>
-            <p className="text-xl text-muted-foreground mt-2">{weather.description}</p>
+            <p className="text-2xl text-muted-foreground mt-2">{weather.description}</p>
           </div>
         </div>
 
         <div className={cn("flex items-center gap-4 p-4 rounded-2xl mt-4", tempStatus.bgColor)}>
           <Thermometer className={cn("w-10 h-10", tempStatus.color)} />
           <div className="flex items-baseline gap-3">
-            <span className={cn("text-3xl font-bold", tempStatus.color)}>
+            <span className={cn("text-4xl font-bold", tempStatus.color)}>
               {tempStatus.label}
             </span>
-            <span className="text-2xl text-muted-foreground">
+            <span className="text-3xl text-muted-foreground">
               {temp.toFixed(1)}°C
             </span>
           </div>

@@ -65,7 +65,7 @@ export const WeatherCard = ({
             <div className={cn("p-4 rounded-2xl shadow-lg transition-transform duration-300 hover:scale-105", getIconBg(), iconColor)}>
               <Icon className="w-12 h-12" />
             </div>
-            <span className="text-2xl md:text-3xl font-semibold text-muted-foreground uppercase tracking-wide">
+            <span className="text-3xl md:text-4xl font-semibold text-muted-foreground uppercase tracking-wide">
               {title}
             </span>
           </div>
@@ -74,20 +74,20 @@ export const WeatherCard = ({
         <div className="space-y-3">
           <div className="flex items-baseline gap-3">
             <span className={cn(
-              "text-7xl md:text-8xl font-bold tracking-tight",
+              "text-8xl md:text-9xl font-bold tracking-tight",
               isTemp ? "bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent" :
               isHumidity ? "bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent" :
               "text-foreground"
             )}>
               {typeof value === "number" ? value.toFixed(1) : value}
             </span>
-            <span className="text-4xl font-medium text-muted-foreground">
+            <span className="text-5xl font-medium text-muted-foreground">
               {unit}
             </span>
           </div>
 
           {description && (
-            <p className="text-xl text-muted-foreground">{description}</p>
+            <p className="text-2xl text-muted-foreground">{description}</p>
           )}
         </div>
 
