@@ -3,6 +3,7 @@ import { Calendar, Clock, Droplets, RefreshCw, Sparkles } from "lucide-react";
 import { format } from "date-fns";
 import { th } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 interface DateTimeDisplayProps {
   lastUpdate?: Date;
@@ -64,15 +65,26 @@ export const DateTimeDisplay = ({ lastUpdate, humidity, isLoading }: DateTimeDis
                 <span className="text-xl text-muted-foreground">
                   อัพเดทล่าสุด: <span className="font-semibold text-foreground">{format(lastUpdate, "HH:mm:ss")}</span>
                 </span>
+
+                {typeof humidity === "number" && (
+                  <Badge variant="secondary" className="ml-1 px-3 py-1 text-base font-semibold">
+                    <span className="inline-flex items-center gap-2">
+                      <Droplets className="h-4 w-4" />
+                      <span>{humidity.toFixed(1)}%</span>
+                    </span>
+                  </Badge>
+                )}
               </div>
             )}
 
-            {typeof humidity === "number" && (
-              <div className={cn("flex items-center gap-3", lastUpdate ? "mt-2 pl-9" : "") }>
-                <Droplets className="w-6 h-6 text-primary" />
-                <span className="text-xl text-muted-foreground">
-                  ความชื้นสัมพัทธ์: <span className="font-semibold text-foreground">{humidity.toFixed(1)}%</span>
-                </span>
+            {typeof humidity === "number" && !lastUpdate && (
+              <div className="flex items-center gap-3">
+                <Badge variant="secondary" className="px-3 py-1 text-base font-semibold">
+                  <span className="inline-flex items-center gap-2">
+                    <Droplets className="h-4 w-4" />
+                    <span>ความชื้นสัมพัทธ์ {humidity.toFixed(1)}%</span>
+                  </span>
+                </Badge>
               </div>
             )}
           </div>
