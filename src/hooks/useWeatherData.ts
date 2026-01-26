@@ -57,11 +57,11 @@ const parseCSVData = (csvText: string): WeatherData => {
   for (let i = 0; i < lines.length; i++) {
     const row = parseCSVLine(lines[i]);
     
-    // Find current values - look for row with numbers in column F, G, H
+    // Find current values from "Temp Now", "Humidity Now", "Dust Now" columns (indices 6, 7, 8)
     if (i >= 1 && i <= 4) {
-      const tempNow = parseFloat(row[5]);
-      const humidityNow = parseFloat(row[6]);
-      const pm25Now = parseFloat(row[7]);
+      const tempNow = parseFloat(row[6]);      // Temp Now (column G)
+      const humidityNow = parseFloat(row[7]);  // Humidity Now (column H)
+      const pm25Now = parseFloat(row[8]);      // Dust Now (column I)
       
       if (!isNaN(tempNow) && tempNow > 0) {
         currentTemp = tempNow;
