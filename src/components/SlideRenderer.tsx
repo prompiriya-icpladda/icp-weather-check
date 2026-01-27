@@ -14,7 +14,14 @@ export const SlideRenderer = ({ slide }: SlideRendererProps) => {
     case "iframe":
       return <IframeSlide url={slide.url || ""} title={slide.title} />;
     case "announcement":
-      return <AnnouncementSlide title={slide.title} content={slide.content || ""} />;
+      return (
+        <AnnouncementSlide 
+          title={slide.title} 
+          content={slide.content || ""} 
+          fileUrl={slide.file_url}
+          fileType={slide.file_type}
+        />
+      );
     default:
       return null;
   }

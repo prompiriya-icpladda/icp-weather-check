@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useSlides } from "@/hooks/useSlides";
 import { SlideRenderer } from "./SlideRenderer";
 import { SlideIndicator } from "./SlideIndicator";
+import { WeatherSidebar } from "./WeatherSidebar";
 import { Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -76,21 +77,33 @@ export const SlideShow = () => {
     );
   }
 
+  const showWeatherSidebar = currentSlide && currentSlide.type !== "weather";
+
   return (
     <div className="h-screen flex flex-col bg-background relative">
       {/* Settings button */}
       <Link 
         to="/settings" 
-        className="absolute top-4 right-4 z-50 opacity-30 hover:opacity-100 transition-opacity"
+        className="absolute top-4 z-50 opacity-30 hover:opacity-100 transition-opacity"
+        style={{ right: showWeatherSidebar ? "17rem" : "1rem" }}
       >
         <Button variant="outline" size="icon">
           <Settings className="h-4 w-4" />
         </Button>
       </Link>
 
-      {/* Main slide content */}
-      <div className="flex-1 overflow-hidden">
-        {currentSlide && <SlideRenderer slide={currentSlide} />}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Main slide content */}
+        <div className="flex-1 overflow-hidden">
+          {currentSlide && <SlideRenderer slide={currentSlide} />}
+        </div>
+
+        {/* Weather Sidebar - shown on non-weather slides */}
+        {showWeatherSidebar && (
+          <div className="w-64 shrink-0">
+            <WeatherSidebar />
+          </div>
+        )}
       </div>
 
       {/* Slide indicators */}
