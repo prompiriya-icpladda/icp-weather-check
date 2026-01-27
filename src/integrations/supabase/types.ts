@@ -19,6 +19,8 @@ export type Database = {
           content: string | null
           created_at: string
           duration: number
+          file_type: string | null
+          file_url: string | null
           id: string
           is_active: boolean
           order_index: number
@@ -31,6 +33,8 @@ export type Database = {
           content?: string | null
           created_at?: string
           duration?: number
+          file_type?: string | null
+          file_url?: string | null
           id?: string
           is_active?: boolean
           order_index?: number
@@ -43,6 +47,8 @@ export type Database = {
           content?: string | null
           created_at?: string
           duration?: number
+          file_type?: string | null
+          file_url?: string | null
           id?: string
           is_active?: boolean
           order_index?: number

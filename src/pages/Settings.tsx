@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Plus, Trash2, GripVertical, Eye, EyeOff } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, GripVertical, Eye, EyeOff, Upload, Image, FileText, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -21,6 +21,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useAllSlides, useCreateSlide, useUpdateSlide, useDeleteSlide, Slide } from "@/hooks/useSlides";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const Settings = () => {
@@ -31,13 +32,64 @@ const Settings = () => {
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSlide, setEditingSlide] = useState<Slide | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     title: "",
     type: "announcement" as "weather" | "iframe" | "announcement",
     url: "",
     content: "",
     duration: 60,
+    file_url: "",
+    file_type: "" as "" | "image" | "pdf",
   });
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error("รองรับเฉพาะไฟล์รูปภาพ (JPG, PNG, GIF, WEBP) และ PDF เท่านั้น");
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      
+      const { data, error } = await supabase.storage
+        .from('announcements')
+        .upload(fileName, file);
+
+      if (error) throw error;
+
+      const { data: urlData } = supabase.storage
+        .from('announcements')
+        .getPublicUrl(fileName);
+
+      const fileType = file.type === 'application/pdf' ? 'pdf' : 'image';
+      setFormData({ 
+        ...formData, 
+        file_url: urlData.publicUrl, 
+        file_type: fileType 
+      });
+      toast.success("อัพโหลดไฟล์สำเร็จ");
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast.error("อัพโหลดไฟล์ไม่สำเร็จ");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleRemoveFile = () => {
+    setFormData({ ...formData, file_url: "", file_type: "" });
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,6 +99,8 @@ const Settings = () => {
       type: formData.type,
       url: formData.type === "iframe" ? formData.url : null,
       content: formData.type === "announcement" ? formData.content : null,
+      file_url: formData.type === "announcement" ? formData.file_url || null : null,
+      file_type: formData.type === "announcement" && formData.file_type ? formData.file_type : null,
       duration: formData.duration,
       order_index: editingSlide?.order_index ?? (slides?.length || 0),
       is_active: editingSlide?.is_active ?? true,
@@ -74,6 +128,8 @@ const Settings = () => {
       url: slide.url || "",
       content: slide.content || "",
       duration: slide.duration,
+      file_url: slide.file_url || "",
+      file_type: (slide.file_type as "" | "image" | "pdf") || "",
     });
     setIsDialogOpen(true);
   };
@@ -107,7 +163,12 @@ const Settings = () => {
       url: "",
       content: "",
       duration: 60,
+      file_url: "",
+      file_type: "",
     });
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const getTypeLabel = (type: string) => {
@@ -196,16 +257,86 @@ const Settings = () => {
                 )}
 
                 {formData.type === "announcement" && (
-                  <div className="space-y-2">
-                    <Label htmlFor="content">เนื้อหา</Label>
-                    <Textarea
-                      id="content"
-                      value={formData.content}
-                      onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                      placeholder="เนื้อหาประกาศ..."
-                      rows={4}
-                    />
-                  </div>
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="content">เนื้อหา (ข้อความ)</Label>
+                      <Textarea
+                        id="content"
+                        value={formData.content}
+                        onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                        placeholder="เนื้อหาประกาศ..."
+                        rows={3}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>ไฟล์แนบ (รูปภาพ หรือ PDF)</Label>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/jpeg,image/png,image/gif,image/webp,application/pdf"
+                        onChange={handleFileUpload}
+                        className="hidden"
+                        id="file-upload"
+                      />
+                      
+                      {formData.file_url ? (
+                        <div className="relative border border-border rounded-lg p-3 bg-muted/30">
+                          <div className="flex items-center gap-3">
+                            {formData.file_type === "pdf" ? (
+                              <FileText className="h-10 w-10 text-red-500" />
+                            ) : (
+                              <img 
+                                src={formData.file_url} 
+                                alt="Preview" 
+                                className="h-16 w-16 object-cover rounded"
+                              />
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium truncate">
+                                {formData.file_type === "pdf" ? "ไฟล์ PDF" : "รูปภาพ"}
+                              </p>
+                              <p className="text-xs text-muted-foreground truncate">
+                                {formData.file_url.split('/').pop()}
+                              </p>
+                            </div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={handleRemoveFile}
+                              className="text-destructive hover:text-destructive"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div
+                          onClick={() => fileInputRef.current?.click()}
+                          className="border-2 border-dashed border-border rounded-lg p-6 text-center cursor-pointer hover:border-primary/50 hover:bg-muted/30 transition-colors"
+                        >
+                          {isUploading ? (
+                            <div className="flex flex-col items-center gap-2">
+                              <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
+                              <p className="text-sm text-muted-foreground">กำลังอัพโหลด...</p>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center gap-2">
+                              <div className="flex gap-2">
+                                <Image className="h-8 w-8 text-muted-foreground" />
+                                <FileText className="h-8 w-8 text-muted-foreground" />
+                              </div>
+                              <p className="text-sm font-medium">คลิกเพื่ออัพโหลด</p>
+                              <p className="text-xs text-muted-foreground">
+                                รองรับ JPG, PNG, GIF, WEBP, PDF
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </>
                 )}
 
                 <div className="space-y-2">
@@ -291,11 +422,25 @@ const Settings = () => {
                     </p>
                   </CardContent>
                 )}
-                {slide.type === "announcement" && slide.content && (
-                  <CardContent className="pt-0">
-                    <p className="text-sm text-muted-foreground line-clamp-2">
-                      {slide.content}
-                    </p>
+                {slide.type === "announcement" && (
+                  <CardContent className="pt-0 space-y-2">
+                    {slide.file_url && (
+                      <div className="flex items-center gap-2">
+                        {slide.file_type === "pdf" ? (
+                          <FileText className="h-4 w-4 text-red-500" />
+                        ) : (
+                          <Image className="h-4 w-4 text-blue-500" />
+                        )}
+                        <span className="text-sm text-muted-foreground">
+                          {slide.file_type === "pdf" ? "ไฟล์ PDF" : "รูปภาพ"}
+                        </span>
+                      </div>
+                    )}
+                    {slide.content && (
+                      <p className="text-sm text-muted-foreground line-clamp-2">
+                        {slide.content}
+                      </p>
+                    )}
                   </CardContent>
                 )}
               </Card>

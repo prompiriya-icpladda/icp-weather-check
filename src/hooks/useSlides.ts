@@ -7,6 +7,8 @@ export interface Slide {
   type: "weather" | "iframe" | "announcement";
   url?: string;
   content?: string;
+  file_url?: string;
+  file_type?: "image" | "pdf";
   duration: number;
   order_index: number;
   is_active: boolean;
