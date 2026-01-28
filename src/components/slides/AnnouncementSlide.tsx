@@ -13,15 +13,17 @@ export const AnnouncementSlide = ({ title, content, fileUrl, fileType }: Announc
     if (fileType === "pdf") {
       return (
         <div className="h-full w-full flex flex-col bg-gradient-to-br from-primary/5 via-background to-secondary/5">
-          <div className="bg-card/80 backdrop-blur-sm border-b border-border px-6 py-4 flex items-center gap-4">
-            <div className="p-3 rounded-full bg-primary/20">
-              <FileText className="h-8 w-8 text-primary" />
+          {/* Compact header for PDF */}
+          <div className="bg-card/80 backdrop-blur-sm border-b border-border px-4 py-2 flex items-center gap-3 shrink-0">
+            <div className="p-2 rounded-full bg-primary/20">
+              <FileText className="h-5 w-5 text-primary" />
             </div>
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+            <h1 className="text-xl font-bold text-foreground truncate">
               {title}
             </h1>
           </div>
-          <div className="flex-1 p-4">
+          {/* Maximize PDF viewer space */}
+          <div className="flex-1 p-2 min-h-0">
             <iframe
               src={`${fileUrl}#toolbar=0&navpanes=0`}
               className="w-full h-full rounded-lg border border-border shadow-lg"
@@ -32,26 +34,30 @@ export const AnnouncementSlide = ({ title, content, fileUrl, fileType }: Announc
       );
     }
 
-    // Image display
+    // Image display - maximize image size
     return (
-      <div className="h-full w-full flex flex-col items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/5 p-8">
-        <div className="max-w-6xl w-full h-full flex flex-col items-center justify-center gap-6">
-          <h1 className="text-3xl md:text-5xl font-bold text-foreground text-center">
+      <div className="h-full w-full flex flex-col bg-gradient-to-br from-primary/5 via-background to-secondary/5">
+        {/* Compact header for image */}
+        <div className="bg-card/80 backdrop-blur-sm border-b border-border px-4 py-2 flex items-center justify-center shrink-0">
+          <h1 className="text-xl font-bold text-foreground text-center truncate">
             {title}
           </h1>
-          <div className="flex-1 flex items-center justify-center w-full overflow-hidden">
-            <img
-              src={fileUrl}
-              alt={title}
-              className="max-w-full max-h-full object-contain rounded-xl shadow-2xl"
-            />
-          </div>
-          {content && (
-            <div className="text-lg md:text-xl text-muted-foreground text-center max-w-3xl">
-              {content}
-            </div>
-          )}
         </div>
+        {/* Maximize image space */}
+        <div className="flex-1 flex items-center justify-center p-4 min-h-0">
+          <img
+            src={fileUrl}
+            alt={title}
+            className="max-w-full max-h-full object-contain rounded-xl shadow-2xl"
+          />
+        </div>
+        {content && (
+          <div className="bg-card/60 backdrop-blur-sm border-t border-border px-4 py-2 shrink-0">
+            <p className="text-base text-muted-foreground text-center truncate">
+              {content}
+            </p>
+          </div>
+        )}
       </div>
     );
   }
