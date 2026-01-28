@@ -21,6 +21,7 @@ export const IframeSlide = ({ url, title }: IframeSlideProps) => {
         title={title}
         className="h-full w-full border-0"
         onLoad={() => setIsLoading(false)}
+        sandbox="allow-scripts allow-same-origin allow-popups"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
       />
