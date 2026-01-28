@@ -1,6 +1,6 @@
-import { useState, useRef } from "react";
-import { Link } from "react-router-dom";
-import { ArrowLeft, Plus, Trash2, GripVertical, Eye, EyeOff, Upload, Image, FileText, X } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { ArrowLeft, Plus, Trash2, GripVertical, Eye, EyeOff, Image, FileText, X, LogOut, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -21,10 +21,15 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useAllSlides, useCreateSlide, useUpdateSlide, useDeleteSlide, Slide } from "@/hooks/useSlides";
+import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { validateIframeUrl, getAllowedDomains } from "@/lib/urlValidation";
 
 const Settings = () => {
+  const navigate = useNavigate();
+  const { user, loading: authLoading, isAdmin, signOut } = useAuth();
+  
   const { data: slides, isLoading } = useAllSlides();
   const createSlide = useCreateSlide();
   const updateSlide = useUpdateSlide();
@@ -43,6 +48,24 @@ const Settings = () => {
     file_url: "",
     file_type: "" as "" | "image" | "pdf",
   });
+  const [urlError, setUrlError] = useState<string | null>(null);
+
+  // Redirect to auth if not logged in or not admin
+  useEffect(() => {
+    if (!authLoading) {
+      if (!user) {
+        navigate('/auth');
+      } else if (!isAdmin) {
+        toast.error('คุณไม่มีสิทธิ์เข้าถึงหน้านี้');
+        navigate('/');
+      }
+    }
+  }, [user, isAdmin, authLoading, navigate]);
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -51,6 +74,13 @@ const Settings = () => {
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'];
     if (!allowedTypes.includes(file.type)) {
       toast.error("รองรับเฉพาะไฟล์รูปภาพ (JPG, PNG, GIF, WEBP) และ PDF เท่านั้น");
+      return;
+    }
+
+    // File size validation (10MB max)
+    const maxFileSize = 10 * 1024 * 1024;
+    if (file.size > maxFileSize) {
+      toast.error("ไฟล์ใหญ่เกินไป (สูงสุด 10MB)");
       return;
     }
 
@@ -93,6 +123,16 @@ const Settings = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate iframe URL if type is iframe
+    if (formData.type === "iframe") {
+      const validation = validateIframeUrl(formData.url);
+      if (!validation.valid) {
+        setUrlError(validation.error || 'URL ไม่ถูกต้อง');
+        toast.error(validation.error || 'URL ไม่ถูกต้อง');
+        return;
+      }
+    }
 
     const slideData = {
       title: formData.title,
@@ -157,6 +197,7 @@ const Settings = () => {
   const resetForm = () => {
     setIsDialogOpen(false);
     setEditingSlide(null);
+    setUrlError(null);
     setFormData({
       title: "",
       type: "announcement",
@@ -170,6 +211,20 @@ const Settings = () => {
       fileInputRef.current.value = "";
     }
   };
+
+  // Show loading state while checking auth
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // Don't render if not authenticated or not admin
+  if (!user || !isAdmin) {
+    return null;
+  }
 
   const getTypeLabel = (type: string) => {
     switch (type) {
@@ -198,170 +253,187 @@ const Settings = () => {
             <h1 className="text-2xl font-bold">ตั้งค่าสไลด์</h1>
           </div>
 
-          <Dialog open={isDialogOpen} onOpenChange={(open) => !open && resetForm()}>
-            <DialogTrigger asChild>
-              <Button onClick={() => setIsDialogOpen(true)}>
-                <Plus className="mr-2 h-4 w-4" />
-                เพิ่มสไลด์
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]">
-              <DialogHeader>
-                <DialogTitle>
-                  {editingSlide ? "แก้ไขสไลด์" : "เพิ่มสไลด์ใหม่"}
-                </DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="title">ชื่อสไลด์</Label>
-                  <Input
-                    id="title"
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    placeholder="ชื่อสไลด์"
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="type">ประเภท</Label>
-                  <Select
-                    value={formData.type}
-                    onValueChange={(value: "weather" | "iframe" | "announcement") =>
-                      setFormData({ ...formData, type: value })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="weather">สภาพอากาศ</SelectItem>
-                      <SelectItem value="iframe">เว็บไซต์ (iframe)</SelectItem>
-                      <SelectItem value="announcement">ประกาศ</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {formData.type === "iframe" && (
+          <div className="flex items-center gap-2">
+            <Dialog open={isDialogOpen} onOpenChange={(open) => !open && resetForm()}>
+              <DialogTrigger asChild>
+                <Button onClick={() => setIsDialogOpen(true)}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  เพิ่มสไลด์
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[500px]">
+                <DialogHeader>
+                  <DialogTitle>
+                    {editingSlide ? "แก้ไขสไลด์" : "เพิ่มสไลด์ใหม่"}
+                  </DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="url">URL</Label>
+                    <Label htmlFor="title">ชื่อสไลด์</Label>
                     <Input
-                      id="url"
-                      type="url"
-                      value={formData.url}
-                      onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-                      placeholder="https://example.com"
+                      id="title"
+                      value={formData.title}
+                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                      placeholder="ชื่อสไลด์"
                       required
                     />
                   </div>
-                )}
 
-                {formData.type === "announcement" && (
-                  <>
-                    <div className="space-y-2">
-                      <Label htmlFor="content">เนื้อหา (ข้อความ)</Label>
-                      <Textarea
-                        id="content"
-                        value={formData.content}
-                        onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                        placeholder="เนื้อหาประกาศ..."
-                        rows={3}
-                      />
-                    </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="type">ประเภท</Label>
+                    <Select
+                      value={formData.type}
+                      onValueChange={(value: "weather" | "iframe" | "announcement") =>
+                        setFormData({ ...formData, type: value })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="weather">สภาพอากาศ</SelectItem>
+                        <SelectItem value="iframe">เว็บไซต์ (iframe)</SelectItem>
+                        <SelectItem value="announcement">ประกาศ</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
+                  {formData.type === "iframe" && (
                     <div className="space-y-2">
-                      <Label>ไฟล์แนบ (รูปภาพ หรือ PDF)</Label>
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/jpeg,image/png,image/gif,image/webp,application/pdf"
-                        onChange={handleFileUpload}
-                        className="hidden"
-                        id="file-upload"
+                      <Label htmlFor="url">URL (ต้องเป็น HTTPS และอยู่ในโดเมนที่อนุญาต)</Label>
+                      <Input
+                        id="url"
+                        type="url"
+                        value={formData.url}
+                        onChange={(e) => {
+                          setFormData({ ...formData, url: e.target.value });
+                          setUrlError(null);
+                        }}
+                        placeholder="https://example.com"
+                        required
+                        className={urlError ? 'border-destructive' : ''}
                       />
-                      
-                      {formData.file_url ? (
-                        <div className="relative border border-border rounded-lg p-3 bg-muted/30">
-                          <div className="flex items-center gap-3">
-                            {formData.file_type === "pdf" ? (
-                              <FileText className="h-10 w-10 text-red-500" />
-                            ) : (
-                              <img 
-                                src={formData.file_url} 
-                                alt="Preview" 
-                                className="h-16 w-16 object-cover rounded"
-                              />
-                            )}
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium truncate">
-                                {formData.file_type === "pdf" ? "ไฟล์ PDF" : "รูปภาพ"}
-                              </p>
-                              <p className="text-xs text-muted-foreground truncate">
-                                {formData.file_url.split('/').pop()}
-                              </p>
-                            </div>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              onClick={handleRemoveFile}
-                              className="text-destructive hover:text-destructive"
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      ) : (
-                        <div
-                          onClick={() => fileInputRef.current?.click()}
-                          className="border-2 border-dashed border-border rounded-lg p-6 text-center cursor-pointer hover:border-primary/50 hover:bg-muted/30 transition-colors"
-                        >
-                          {isUploading ? (
-                            <div className="flex flex-col items-center gap-2">
-                              <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
-                              <p className="text-sm text-muted-foreground">กำลังอัพโหลด...</p>
-                            </div>
-                          ) : (
-                            <div className="flex flex-col items-center gap-2">
-                              <div className="flex gap-2">
-                                <Image className="h-8 w-8 text-muted-foreground" />
-                                <FileText className="h-8 w-8 text-muted-foreground" />
-                              </div>
-                              <p className="text-sm font-medium">คลิกเพื่ออัพโหลด</p>
-                              <p className="text-xs text-muted-foreground">
-                                รองรับ JPG, PNG, GIF, WEBP, PDF
-                              </p>
-                            </div>
-                          )}
-                        </div>
+                      {urlError && (
+                        <p className="text-sm text-destructive">{urlError}</p>
                       )}
+                      <p className="text-xs text-muted-foreground">
+                        โดเมนที่อนุญาต: {getAllowedDomains().slice(0, 3).join(', ')}...
+                      </p>
                     </div>
-                  </>
-                )}
+                  )}
 
-                <div className="space-y-2">
-                  <Label htmlFor="duration">เวลาแสดง (วินาที)</Label>
-                  <Input
-                    id="duration"
-                    type="number"
-                    min={5}
-                    max={300}
-                    value={formData.duration}
-                    onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) || 60 })}
-                  />
-                </div>
+                  {formData.type === "announcement" && (
+                    <>
+                      <div className="space-y-2">
+                        <Label htmlFor="content">เนื้อหา (ข้อความ)</Label>
+                        <Textarea
+                          id="content"
+                          value={formData.content}
+                          onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                          placeholder="เนื้อหาประกาศ..."
+                          rows={3}
+                        />
+                      </div>
 
-                <div className="flex justify-end gap-2 pt-4">
-                  <Button type="button" variant="outline" onClick={resetForm}>
-                    ยกเลิก
-                  </Button>
-                  <Button type="submit" disabled={createSlide.isPending || updateSlide.isPending}>
-                    {editingSlide ? "บันทึก" : "เพิ่ม"}
-                  </Button>
-                </div>
-              </form>
-            </DialogContent>
-          </Dialog>
+                      <div className="space-y-2">
+                        <Label>ไฟล์แนบ (รูปภาพ หรือ PDF)</Label>
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/jpeg,image/png,image/gif,image/webp,application/pdf"
+                          onChange={handleFileUpload}
+                          className="hidden"
+                          id="file-upload"
+                        />
+                        
+                        {formData.file_url ? (
+                          <div className="relative border border-border rounded-lg p-3 bg-muted/30">
+                            <div className="flex items-center gap-3">
+                              {formData.file_type === "pdf" ? (
+                                <FileText className="h-10 w-10 text-red-500" />
+                              ) : (
+                                <img 
+                                  src={formData.file_url} 
+                                  alt="Preview" 
+                                  className="h-16 w-16 object-cover rounded"
+                                />
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium truncate">
+                                  {formData.file_type === "pdf" ? "ไฟล์ PDF" : "รูปภาพ"}
+                                </p>
+                                <p className="text-xs text-muted-foreground truncate">
+                                  {formData.file_url.split('/').pop()}
+                                </p>
+                              </div>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                onClick={handleRemoveFile}
+                                className="text-destructive hover:text-destructive"
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div
+                            onClick={() => fileInputRef.current?.click()}
+                            className="border-2 border-dashed border-border rounded-lg p-6 text-center cursor-pointer hover:border-primary/50 hover:bg-muted/30 transition-colors"
+                          >
+                            {isUploading ? (
+                              <div className="flex flex-col items-center gap-2">
+                                <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
+                                <p className="text-sm text-muted-foreground">กำลังอัพโหลด...</p>
+                              </div>
+                            ) : (
+                              <div className="flex flex-col items-center gap-2">
+                                <div className="flex gap-2">
+                                  <Image className="h-8 w-8 text-muted-foreground" />
+                                  <FileText className="h-8 w-8 text-muted-foreground" />
+                                </div>
+                                <p className="text-sm font-medium">คลิกเพื่ออัพโหลด</p>
+                                <p className="text-xs text-muted-foreground">
+                                  รองรับ JPG, PNG, GIF, WEBP, PDF (สูงสุด 10MB)
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
+
+                  <div className="space-y-2">
+                    <Label htmlFor="duration">เวลาแสดง (วินาที)</Label>
+                    <Input
+                      id="duration"
+                      type="number"
+                      min={5}
+                      max={300}
+                      value={formData.duration}
+                      onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) || 60 })}
+                    />
+                  </div>
+
+                  <div className="flex justify-end gap-2 pt-4">
+                    <Button type="button" variant="outline" onClick={resetForm}>
+                      ยกเลิก
+                    </Button>
+                    <Button type="submit" disabled={createSlide.isPending || updateSlide.isPending}>
+                      {editingSlide ? "บันทึก" : "เพิ่ม"}
+                    </Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
+            
+            <Button variant="outline" onClick={handleSignOut}>
+              <LogOut className="mr-2 h-4 w-4" />
+              ออกจากระบบ
+            </Button>
+          </div>
         </div>
 
         {/* Slides List */}
@@ -371,7 +443,7 @@ const Settings = () => {
               กำลังโหลด...
             </div>
           ) : slides && slides.length > 0 ? (
-            slides.map((slide, index) => (
+            slides.map((slide) => (
               <Card key={slide.id} className={!slide.is_active ? "opacity-50" : ""}>
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
