@@ -7,11 +7,11 @@ export const WeatherSidebar = () => {
 
   if (isLoading) {
     return (
-      <div className="h-full bg-card/80 backdrop-blur-sm border-l border-border p-4 flex flex-col gap-4">
-        <Skeleton className="h-6 w-24" />
-        <Skeleton className="h-20 w-full" />
-        <Skeleton className="h-20 w-full" />
-        <Skeleton className="h-20 w-full" />
+      <div className="h-full bg-card/80 backdrop-blur-sm border-l border-border p-6 flex flex-col gap-6">
+        <Skeleton className="h-8 w-32" />
+        <Skeleton className="h-32 w-full" />
+        <Skeleton className="h-32 w-full" />
+        <Skeleton className="h-32 w-full" />
       </div>
     );
   }
@@ -29,58 +29,56 @@ export const WeatherSidebar = () => {
   const pm25Status = getPM25Status(weatherData.currentPM25);
 
   return (
-    <div className="h-full bg-gradient-to-b from-card/90 to-card/70 backdrop-blur-md border-l border-border/50 p-4 flex flex-col gap-4 overflow-hidden">
-      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+    <div className="h-full bg-gradient-to-b from-card/90 to-card/70 backdrop-blur-md border-l border-border/50 p-6 flex flex-col gap-6 overflow-hidden">
+      <h3 className="text-lg font-bold text-foreground uppercase tracking-wider">
         สภาพอากาศ
       </h3>
 
       {/* Temperature */}
-      <div className="bg-background/50 rounded-xl p-4 border border-border/30">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-weather-temp/20">
-            <Thermometer className="h-5 w-5 text-weather-temp" />
+      <div className="bg-background/50 rounded-2xl p-5 border border-border/30 flex-1 flex items-center">
+        <div className="flex items-center gap-4 w-full">
+          <div className="p-3 rounded-xl bg-weather-temp/20">
+            <Thermometer className="h-8 w-8 text-weather-temp" />
           </div>
-          <div>
-            <p className="text-xs text-muted-foreground">อุณหภูมิ</p>
-            <p className="text-2xl font-bold">{weatherData.currentTemp}°C</p>
+          <div className="flex-1">
+            <p className="text-sm text-muted-foreground font-medium">อุณหภูมิ</p>
+            <p className="text-5xl font-bold leading-tight">{weatherData.currentTemp}°C</p>
           </div>
         </div>
       </div>
 
       {/* Humidity */}
-      <div className="bg-background/50 rounded-xl p-4 border border-border/30">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-weather-humidity/20">
-            <Droplets className="h-5 w-5 text-weather-humidity" />
+      <div className="bg-background/50 rounded-2xl p-5 border border-border/30 flex-1 flex items-center">
+        <div className="flex items-center gap-4 w-full">
+          <div className="p-3 rounded-xl bg-weather-humidity/20">
+            <Droplets className="h-8 w-8 text-weather-humidity" />
           </div>
-          <div>
-            <p className="text-xs text-muted-foreground">ความชื้น</p>
-            <p className="text-2xl font-bold">{weatherData.currentHumidity}%</p>
+          <div className="flex-1">
+            <p className="text-sm text-muted-foreground font-medium">ความชื้น</p>
+            <p className="text-5xl font-bold leading-tight">{weatherData.currentHumidity}%</p>
           </div>
         </div>
       </div>
 
       {/* PM2.5 */}
-      <div className="bg-background/50 rounded-xl p-4 border border-border/30">
-        <div className="flex items-center gap-3">
-          <div className={`p-2 rounded-lg ${pm25Status.bg}`}>
-            <Wind className={`h-5 w-5 ${pm25Status.color}`} />
+      <div className="bg-background/50 rounded-2xl p-5 border border-border/30 flex-1 flex items-center">
+        <div className="flex items-center gap-4 w-full">
+          <div className={`p-3 rounded-xl ${pm25Status.bg}`}>
+            <Wind className={`h-8 w-8 ${pm25Status.color}`} />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs text-muted-foreground">PM 2.5</p>
-            <div className="flex items-center gap-2">
-              <p className="text-2xl font-bold">{weatherData.currentPM25}</p>
-              <span className={`text-xs px-2 py-0.5 rounded-full ${pm25Status.bg} ${pm25Status.color}`}>
-                {pm25Status.label}
-              </span>
-            </div>
+            <p className="text-sm text-muted-foreground font-medium">PM 2.5</p>
+            <p className="text-5xl font-bold leading-tight">{weatherData.currentPM25}</p>
+            <span className={`text-sm px-3 py-1 rounded-full ${pm25Status.bg} ${pm25Status.color} font-medium inline-block mt-1`}>
+              {pm25Status.label}
+            </span>
           </div>
         </div>
       </div>
 
       {/* Last Update */}
-      <div className="mt-auto pt-4 border-t border-border/30">
-        <p className="text-xs text-muted-foreground text-center">
+      <div className="pt-4 border-t border-border/30">
+        <p className="text-sm text-muted-foreground text-center">
           อัพเดท: {weatherData.lastUpdate instanceof Date 
             ? weatherData.lastUpdate.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })
             : String(weatherData.lastUpdate)}
