@@ -1,5 +1,6 @@
 import { Sun, Cloud, CloudRain, Thermometer, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { WeatherAnimation, type WeatherCondition } from "./weather-animations";
 
 interface WeatherStatusProps {
   temp: number;
