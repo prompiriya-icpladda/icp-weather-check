@@ -74,6 +74,9 @@ export const WeatherStatus = ({ temp, humidity, delay = 0 }: WeatherStatusProps)
       className="stat-card opacity-0 animate-slide-up h-full flex flex-col justify-center relative overflow-hidden"
       style={{ animationDelay: `${delay}ms` }}
     >
+      {/* Weather Animation Background */}
+      <WeatherAnimation condition={weather.animationCondition} />
+      
       {/* Decorative background elements */}
       <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-primary/5 to-transparent rounded-full blur-3xl" />
       <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-accent/5 to-transparent rounded-full blur-2xl" />
