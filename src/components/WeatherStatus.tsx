@@ -9,7 +9,15 @@ interface WeatherStatusProps {
 }
 
 export const WeatherStatus = ({ temp, humidity, delay = 0 }: WeatherStatusProps) => {
-  const getWeatherCondition = () => {
+  const getWeatherCondition = (): { 
+    icon: typeof Sun; 
+    label: string; 
+    description: string; 
+    bgClass: string; 
+    iconClass: string; 
+    glowClass: string;
+    animationCondition: WeatherCondition;
+  } => {
     if (humidity > 80) {
       return {
         icon: CloudRain,
@@ -18,6 +26,7 @@ export const WeatherStatus = ({ temp, humidity, delay = 0 }: WeatherStatusProps)
         bgClass: "bg-gradient-to-br from-primary/20 to-secondary/20",
         iconClass: "text-primary",
         glowClass: "shadow-glow-primary",
+        animationCondition: "rainy",
       };
     } else if (humidity > 60) {
       return {
@@ -27,6 +36,7 @@ export const WeatherStatus = ({ temp, humidity, delay = 0 }: WeatherStatusProps)
         bgClass: "bg-gradient-to-br from-muted to-muted/50",
         iconClass: "text-muted-foreground",
         glowClass: "",
+        animationCondition: "cloudy",
       };
     } else {
       return {
@@ -36,6 +46,7 @@ export const WeatherStatus = ({ temp, humidity, delay = 0 }: WeatherStatusProps)
         bgClass: "bg-gradient-to-br from-accent/20 to-yellow-400/20",
         iconClass: "text-accent",
         glowClass: "shadow-glow-warm",
+        animationCondition: "sunny",
       };
     }
   };
