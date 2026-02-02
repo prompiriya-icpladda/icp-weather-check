@@ -1,5 +1,6 @@
 import { Sun, Cloud, CloudRain, Thermometer, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { WeatherAnimation, type WeatherCondition } from "./weather-animations";
 
 interface WeatherStatusProps {
   temp: number;
@@ -8,7 +9,15 @@ interface WeatherStatusProps {
 }
 
 export const WeatherStatus = ({ temp, humidity, delay = 0 }: WeatherStatusProps) => {
-  const getWeatherCondition = () => {
+  const getWeatherCondition = (): { 
+    icon: typeof Sun; 
+    label: string; 
+    description: string; 
+    bgClass: string; 
+    iconClass: string; 
+    glowClass: string;
+    animationCondition: WeatherCondition;
+  } => {
     if (humidity > 80) {
       return {
         icon: CloudRain,
@@ -17,6 +26,7 @@ export const WeatherStatus = ({ temp, humidity, delay = 0 }: WeatherStatusProps)
         bgClass: "bg-gradient-to-br from-primary/20 to-secondary/20",
         iconClass: "text-primary",
         glowClass: "shadow-glow-primary",
+        animationCondition: "rainy",
       };
     } else if (humidity > 60) {
       return {
@@ -26,6 +36,7 @@ export const WeatherStatus = ({ temp, humidity, delay = 0 }: WeatherStatusProps)
         bgClass: "bg-gradient-to-br from-muted to-muted/50",
         iconClass: "text-muted-foreground",
         glowClass: "",
+        animationCondition: "cloudy",
       };
     } else {
       return {
@@ -35,6 +46,7 @@ export const WeatherStatus = ({ temp, humidity, delay = 0 }: WeatherStatusProps)
         bgClass: "bg-gradient-to-br from-accent/20 to-yellow-400/20",
         iconClass: "text-accent",
         glowClass: "shadow-glow-warm",
+        animationCondition: "sunny",
       };
     }
   };
@@ -62,6 +74,9 @@ export const WeatherStatus = ({ temp, humidity, delay = 0 }: WeatherStatusProps)
       className="stat-card opacity-0 animate-slide-up h-full flex flex-col justify-center relative overflow-hidden"
       style={{ animationDelay: `${delay}ms` }}
     >
+      {/* Weather Animation Background */}
+      <WeatherAnimation condition={weather.animationCondition} />
+      
       {/* Decorative background elements */}
       <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-primary/5 to-transparent rounded-full blur-3xl" />
       <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-accent/5 to-transparent rounded-full blur-2xl" />
