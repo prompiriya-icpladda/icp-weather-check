@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Plus, Trash2, GripVertical, Eye, EyeOff, Image, FileText, X } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, GripVertical, Eye, EyeOff, Image, FileText, X, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -37,12 +37,12 @@ const Settings = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     title: "",
-    type: "announcement" as "weather" | "iframe" | "announcement",
+    type: "announcement" as "weather" | "iframe" | "announcement" | "video",
     url: "",
     content: "",
     duration: 60,
     file_url: "",
-    file_type: "" as "" | "image" | "pdf",
+    file_type: "" as "" | "image" | "pdf" | "video",
   });
   const [urlError, setUrlError] = useState<string | null>(null);
 
@@ -50,16 +50,17 @@ const Settings = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'];
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf', 'video/mp4', 'video/webm'];
     if (!allowedTypes.includes(file.type)) {
-      toast.error("รองรับเฉพาะไฟล์รูปภาพ (JPG, PNG, GIF, WEBP) และ PDF เท่านั้น");
+      toast.error("รองรับเฉพาะไฟล์รูปภาพ (JPG, PNG, GIF, WEBP), PDF และวิดีโอ (MP4, WEBM) เท่านั้น");
       return;
     }
 
-    // File size validation (10MB max)
-    const maxFileSize = 10 * 1024 * 1024;
+    // File size validation (50MB max for video, 10MB for others)
+    const isVideo = file.type.startsWith('video/');
+    const maxFileSize = isVideo ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
     if (file.size > maxFileSize) {
-      toast.error("ไฟล์ใหญ่เกินไป (สูงสุด 10MB)");
+      toast.error(isVideo ? "ไฟล์วิดีโอใหญ่เกินไป (สูงสุด 50MB)" : "ไฟล์ใหญ่เกินไป (สูงสุด 10MB)");
       return;
     }
 
@@ -78,7 +79,11 @@ const Settings = () => {
         .from('announcements')
         .getPublicUrl(fileName);
 
-      const fileType = file.type === 'application/pdf' ? 'pdf' : 'image';
+      const fileType = file.type === 'application/pdf' 
+        ? 'pdf' 
+        : file.type.startsWith('video/') 
+          ? 'video' 
+          : 'image';
       setFormData({ 
         ...formData, 
         file_url: urlData.publicUrl, 
@@ -118,8 +123,8 @@ const Settings = () => {
       type: formData.type,
       url: formData.type === "iframe" ? formData.url : null,
       content: formData.type === "announcement" ? formData.content : null,
-      file_url: formData.type === "announcement" ? formData.file_url || null : null,
-      file_type: formData.type === "announcement" && formData.file_type ? formData.file_type : null,
+      file_url: (formData.type === "announcement" || formData.type === "video") ? formData.file_url || null : null,
+      file_type: (formData.type === "announcement" || formData.type === "video") && formData.file_type ? formData.file_type : null,
       duration: formData.duration,
       order_index: editingSlide?.order_index ?? (slides?.length || 0),
       is_active: editingSlide?.is_active ?? true,
@@ -148,7 +153,7 @@ const Settings = () => {
       content: slide.content || "",
       duration: slide.duration,
       file_url: slide.file_url || "",
-      file_type: (slide.file_type as "" | "image" | "pdf") || "",
+      file_type: (slide.file_type as "" | "image" | "pdf" | "video") || "",
     });
     setIsDialogOpen(true);
   };
@@ -200,6 +205,8 @@ const Settings = () => {
         return "เว็บไซต์ (iframe)";
       case "announcement":
         return "ประกาศ";
+      case "video":
+        return "วิดีโอ";
       default:
         return type;
     }
@@ -249,8 +256,8 @@ const Settings = () => {
                     <Label htmlFor="type">ประเภท</Label>
                     <Select
                       value={formData.type}
-                      onValueChange={(value: "weather" | "iframe" | "announcement") =>
-                        setFormData({ ...formData, type: value })
+                      onValueChange={(value: "weather" | "iframe" | "announcement" | "video") =>
+                        setFormData({ ...formData, type: value, file_url: "", file_type: "" })
                       }
                     >
                       <SelectTrigger>
@@ -260,6 +267,7 @@ const Settings = () => {
                         <SelectItem value="weather">สภาพอากาศ</SelectItem>
                         <SelectItem value="iframe">เว็บไซต์ (iframe)</SelectItem>
                         <SelectItem value="announcement">ประกาศ</SelectItem>
+                        <SelectItem value="video">วิดีโอ</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -369,6 +377,63 @@ const Settings = () => {
                         )}
                       </div>
                     </>
+                  )}
+
+                  {formData.type === "video" && (
+                    <div className="space-y-2">
+                      <Label>ไฟล์วิดีโอ (MP4, WEBM)</Label>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="video/mp4,video/webm"
+                        onChange={handleFileUpload}
+                        className="hidden"
+                        id="video-upload"
+                      />
+                      
+                      {formData.file_url ? (
+                        <div className="relative border border-border rounded-lg p-3 bg-muted/30">
+                          <div className="flex items-center gap-3">
+                            <Video className="h-10 w-10 text-blue-500" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium truncate">ไฟล์วิดีโอ</p>
+                              <p className="text-xs text-muted-foreground truncate">
+                                {formData.file_url.split('/').pop()}
+                              </p>
+                            </div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={handleRemoveFile}
+                              className="text-destructive hover:text-destructive"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div
+                          onClick={() => fileInputRef.current?.click()}
+                          className="border-2 border-dashed border-border rounded-lg p-6 text-center cursor-pointer hover:border-primary/50 hover:bg-muted/30 transition-colors"
+                        >
+                          {isUploading ? (
+                            <div className="flex flex-col items-center gap-2">
+                              <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
+                              <p className="text-sm text-muted-foreground">กำลังอัพโหลด...</p>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center gap-2">
+                              <Video className="h-8 w-8 text-muted-foreground" />
+                              <p className="text-sm font-medium">คลิกเพื่ออัพโหลดวิดีโอ</p>
+                              <p className="text-xs text-muted-foreground">
+                                รองรับ MP4, WEBM (สูงสุด 50MB)
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   )}
 
                   <div className="space-y-2">
