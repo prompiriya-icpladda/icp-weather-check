@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Plus, Trash2, GripVertical, Eye, EyeOff, Image, FileText, X, LogOut, Loader2 } from "lucide-react";
+import { useState, useRef } from "react";
+import { Link } from "react-router-dom";
+import { ArrowLeft, Plus, Trash2, GripVertical, Eye, EyeOff, Image, FileText, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -21,15 +21,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useAllSlides, useCreateSlide, useUpdateSlide, useDeleteSlide, Slide } from "@/hooks/useSlides";
-import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { validateIframeUrl, getAllowedDomains } from "@/lib/urlValidation";
 
 const Settings = () => {
-  const navigate = useNavigate();
-  const { user, loading: authLoading, isAdmin, signOut } = useAuth();
-  
   const { data: slides, isLoading } = useAllSlides();
   const createSlide = useCreateSlide();
   const updateSlide = useUpdateSlide();
@@ -49,23 +45,6 @@ const Settings = () => {
     file_type: "" as "" | "image" | "pdf",
   });
   const [urlError, setUrlError] = useState<string | null>(null);
-
-  // Redirect to auth if not logged in or not admin
-  useEffect(() => {
-    if (!authLoading) {
-      if (!user) {
-        navigate('/auth');
-      } else if (!isAdmin) {
-        toast.error('คุณไม่มีสิทธิ์เข้าถึงหน้านี้');
-        navigate('/');
-      }
-    }
-  }, [user, isAdmin, authLoading, navigate]);
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/');
-  };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -212,19 +191,6 @@ const Settings = () => {
     }
   };
 
-  // Show loading state while checking auth
-  if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  // Don't render if not authenticated or not admin
-  if (!user || !isAdmin) {
-    return null;
-  }
 
   const getTypeLabel = (type: string) => {
     switch (type) {
@@ -428,11 +394,6 @@ const Settings = () => {
                 </form>
               </DialogContent>
             </Dialog>
-            
-            <Button variant="outline" onClick={handleSignOut}>
-              <LogOut className="mr-2 h-4 w-4" />
-              ออกจากระบบ
-            </Button>
           </div>
         </div>
 
