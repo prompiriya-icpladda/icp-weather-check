@@ -2,6 +2,7 @@ import { Slide } from "@/hooks/useSlides";
 import { WeatherSlide } from "./slides/WeatherSlide";
 import { IframeSlide } from "./slides/IframeSlide";
 import { AnnouncementSlide } from "./slides/AnnouncementSlide";
+import { VideoSlide } from "./slides/VideoSlide";
 
 interface SlideRendererProps {
   slide: Slide;
@@ -22,6 +23,8 @@ export const SlideRenderer = ({ slide }: SlideRendererProps) => {
           fileType={slide.file_type}
         />
       );
+    case "video":
+      return <VideoSlide url={slide.file_url || ""} title={slide.title} />;
     default:
       return null;
   }

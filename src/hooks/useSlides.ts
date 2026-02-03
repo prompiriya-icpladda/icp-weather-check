@@ -4,11 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 export interface Slide {
   id: string;
   title: string;
-  type: "weather" | "iframe" | "announcement";
+  type: "weather" | "iframe" | "announcement" | "video";
   url?: string;
   content?: string;
   file_url?: string;
-  file_type?: "image" | "pdf";
+  file_type?: "image" | "pdf" | "video";
   duration: number;
   order_index: number;
   is_active: boolean;

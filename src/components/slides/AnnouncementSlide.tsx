@@ -4,7 +4,7 @@ interface AnnouncementSlideProps {
   title: string;
   content: string;
   fileUrl?: string;
-  fileType?: "image" | "pdf";
+  fileType?: "image" | "pdf" | "video";
 }
 
 export const AnnouncementSlide = ({ title, content, fileUrl, fileType }: AnnouncementSlideProps) => {
