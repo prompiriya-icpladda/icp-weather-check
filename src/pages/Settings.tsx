@@ -23,7 +23,7 @@ import {
 import { useAllSlides, useCreateSlide, useUpdateSlide, useDeleteSlide, Slide } from "@/hooks/useSlides";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { validateIframeUrl, getAllowedDomains } from "@/lib/urlValidation";
+import { validateIframeUrl } from "@/lib/urlValidation";
 
 const Settings = () => {
   const { data: slides, isLoading } = useAllSlides();
@@ -291,7 +291,7 @@ const Settings = () => {
                         <p className="text-sm text-destructive">{urlError}</p>
                       )}
                       <p className="text-xs text-muted-foreground">
-                        โดเมนที่อนุญาต: {getAllowedDomains().slice(0, 3).join(', ')}...
+                        ใส่ URL ที่ต้องการแสดงใน iframe (HTTPS เท่านั้น)
                       </p>
                     </div>
                   )}
