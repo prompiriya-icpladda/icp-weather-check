@@ -4,6 +4,7 @@ import { useSlides } from "@/hooks/useSlides";
 import { SlideRenderer } from "./SlideRenderer";
 import { SlideIndicator } from "./SlideIndicator";
 import { WeatherSidebar } from "./WeatherSidebar";
+import { NewsTicker } from "./NewsTicker";
 import { Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
