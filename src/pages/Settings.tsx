@@ -24,6 +24,7 @@ import { useAllSlides, useCreateSlide, useUpdateSlide, useDeleteSlide, Slide } f
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { validateIframeUrl } from "@/lib/urlValidation";
+import { TickerSettings } from "@/components/TickerSettings";
 
 const Settings = () => {
   const { data: slides, isLoading } = useAllSlides();
@@ -588,6 +589,11 @@ const Settings = () => {
               <p className="text-sm">คลิก "เพิ่มสไลด์" เพื่อเริ่มต้น</p>
             </div>
           )}
+        </div>
+
+        {/* Ticker Settings Section */}
+        <div className="mt-8">
+          <TickerSettings />
         </div>
       </div>
     </div>
