@@ -197,6 +197,26 @@ const Settings = () => {
   };
 
 
+  const handleMoveSlide = async (slide: Slide, direction: "up" | "down") => {
+    if (!slides) return;
+    const currentIndex = slides.findIndex(s => s.id === slide.id);
+    const targetIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+    
+    if (targetIndex < 0 || targetIndex >= slides.length) return;
+    
+    const targetSlide = slides[targetIndex];
+    
+    try {
+      await Promise.all([
+        updateSlide.mutateAsync({ id: slide.id, order_index: targetSlide.order_index }),
+        updateSlide.mutateAsync({ id: targetSlide.id, order_index: slide.order_index }),
+      ]);
+      toast.success("เปลี่ยนลำดับสำเร็จ");
+    } catch (error) {
+      toast.error("เกิดข้อผิดพลาดในการเปลี่ยนลำดับ");
+    }
+  };
+
   const getTypeLabel = (type: string) => {
     switch (type) {
       case "weather":
