@@ -24,6 +24,7 @@ import { useAllSlides, useCreateSlide, useUpdateSlide, useDeleteSlide, Slide } f
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { validateIframeUrl } from "@/lib/urlValidation";
+import { TickerSettings } from "@/components/TickerSettings";
 
 const Settings = () => {
   const { data: slides, isLoading } = useAllSlides();
