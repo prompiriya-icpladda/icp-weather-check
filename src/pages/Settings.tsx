@@ -494,7 +494,26 @@ const Settings = () => {
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <GripVertical className="h-5 w-5 text-muted-foreground cursor-grab" />
+                      <div className="flex flex-col gap-0.5">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() => handleMoveSlide(slide, "up")}
+                          disabled={slides.findIndex(s => s.id === slide.id) === 0 || updateSlide.isPending}
+                        >
+                          <ChevronUp className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() => handleMoveSlide(slide, "down")}
+                          disabled={slides.findIndex(s => s.id === slide.id) === slides.length - 1 || updateSlide.isPending}
+                        >
+                          <ChevronDown className="h-4 w-4" />
+                        </Button>
+                      </div>
                       <div>
                         <CardTitle className="text-lg">{slide.title}</CardTitle>
                         <p className="text-sm text-muted-foreground">
