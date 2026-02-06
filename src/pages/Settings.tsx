@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Plus, Trash2, GripVertical, Eye, EyeOff, Image, FileText, X, Video } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, ChevronUp, ChevronDown, Eye, EyeOff, Image, FileText, X, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -196,6 +196,26 @@ const Settings = () => {
     }
   };
 
+
+  const handleMoveSlide = async (slide: Slide, direction: "up" | "down") => {
+    if (!slides) return;
+    const currentIndex = slides.findIndex(s => s.id === slide.id);
+    const targetIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+    
+    if (targetIndex < 0 || targetIndex >= slides.length) return;
+    
+    const targetSlide = slides[targetIndex];
+    
+    try {
+      await Promise.all([
+        updateSlide.mutateAsync({ id: slide.id, order_index: targetSlide.order_index }),
+        updateSlide.mutateAsync({ id: targetSlide.id, order_index: slide.order_index }),
+      ]);
+      toast.success("เปลี่ยนลำดับสำเร็จ");
+    } catch (error) {
+      toast.error("เกิดข้อผิดพลาดในการเปลี่ยนลำดับ");
+    }
+  };
 
   const getTypeLabel = (type: string) => {
     switch (type) {
@@ -474,7 +494,26 @@ const Settings = () => {
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <GripVertical className="h-5 w-5 text-muted-foreground cursor-grab" />
+                      <div className="flex flex-col gap-0.5">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() => handleMoveSlide(slide, "up")}
+                          disabled={slides.findIndex(s => s.id === slide.id) === 0 || updateSlide.isPending}
+                        >
+                          <ChevronUp className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() => handleMoveSlide(slide, "down")}
+                          disabled={slides.findIndex(s => s.id === slide.id) === slides.length - 1 || updateSlide.isPending}
+                        >
+                          <ChevronDown className="h-4 w-4" />
+                        </Button>
+                      </div>
                       <div>
                         <CardTitle className="text-lg">{slide.title}</CardTitle>
                         <p className="text-sm text-muted-foreground">
