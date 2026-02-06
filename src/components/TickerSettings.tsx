@@ -189,7 +189,7 @@ export const TickerSettings = () => {
                   {editingId === msg.id ? (
                     <>
                       <Button variant="ghost" size="icon" onClick={handleSaveEdit}>
-                        <Check className="h-4 w-4 text-green-500" />
+                        <Check className="h-4 w-4 text-primary" />
                       </Button>
                       <Button variant="ghost" size="icon" onClick={handleCancelEdit}>
                         <X className="h-4 w-4 text-destructive" />

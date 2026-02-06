@@ -173,6 +173,9 @@ export const SlideShow = () => {
         )}
       </div>
 
+      {/* News Ticker at the bottom */}
+      <NewsTicker />
+
       {/* Slide indicators */}
       {slides.length > 1 && (
         <SlideIndicator

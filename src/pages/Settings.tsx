@@ -590,6 +590,11 @@ const Settings = () => {
             </div>
           )}
         </div>
+
+        {/* Ticker Settings Section */}
+        <div className="mt-8">
+          <TickerSettings />
+        </div>
       </div>
     </div>
   );
