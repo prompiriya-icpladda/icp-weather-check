@@ -138,7 +138,30 @@ export const TickerSettings = () => {
           ข้อความจะแสดงที่ด้านล่างของหน้าจอและเลื่อนอัตโนมัติ
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-6">
+        {/* Speed control */}
+        <div className="space-y-3 p-4 rounded-lg border bg-muted/30">
+          <div className="flex items-center gap-2">
+            <Gauge className="h-4 w-4 text-muted-foreground" />
+            <Label className="text-sm font-medium">ความเร็วการเลื่อน</Label>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="text-xs text-muted-foreground whitespace-nowrap">ช้า</span>
+            <Slider
+              value={[speed]}
+              onValueChange={handleSpeedChange}
+              min={1}
+              max={100}
+              step={1}
+              className="flex-1"
+            />
+            <span className="text-xs text-muted-foreground whitespace-nowrap">เร็ว</span>
+          </div>
+          <p className="text-xs text-muted-foreground text-center">
+            ความเร็วปัจจุบัน: {speed}%
+          </p>
+        </div>
+
         {/* Add new message */}
         <div className="flex gap-2">
           <Input
