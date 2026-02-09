@@ -1,8 +1,10 @@
-import { useState } from "react";
-import { Plus, Trash2, ChevronUp, ChevronDown, Eye, EyeOff, MessageSquare, Edit2, Check, X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Plus, Trash2, ChevronUp, ChevronDown, Eye, EyeOff, MessageSquare, Edit2, Check, X, Gauge } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Slider } from "@/components/ui/slider";
+import { Label } from "@/components/ui/label";
 import {
   useAllTickerMessages,
   useCreateTickerMessage,
@@ -11,6 +13,8 @@ import {
   TickerMessage,
 } from "@/hooks/useTickerMessages";
 import { toast } from "sonner";
+
+const DEFAULT_SPEED = 50;
 
 export const TickerSettings = () => {
   const { data: messages, isLoading } = useAllTickerMessages();
@@ -21,6 +25,25 @@ export const TickerSettings = () => {
   const [newMessage, setNewMessage] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingText, setEditingText] = useState("");
+  const [speed, setSpeed] = useState(DEFAULT_SPEED);
+
+  useEffect(() => {
+    const savedSpeed = localStorage.getItem("ticker-speed");
+    if (savedSpeed) {
+      setSpeed(Number(savedSpeed));
+    }
+  }, []);
+
+  const handleSpeedChange = (value: number[]) => {
+    const newSpeed = value[0];
+    setSpeed(newSpeed);
+    localStorage.setItem("ticker-speed", String(newSpeed));
+    // Dispatch storage event for same-tab updates
+    window.dispatchEvent(new StorageEvent("storage", {
+      key: "ticker-speed",
+      newValue: String(newSpeed),
+    }));
+  };
 
   const handleAdd = async () => {
     if (!newMessage.trim()) {
@@ -115,7 +138,30 @@ export const TickerSettings = () => {
           ข้อความจะแสดงที่ด้านล่างของหน้าจอและเลื่อนอัตโนมัติ
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-6">
+        {/* Speed control */}
+        <div className="space-y-3 p-4 rounded-lg border bg-muted/30">
+          <div className="flex items-center gap-2">
+            <Gauge className="h-4 w-4 text-muted-foreground" />
+            <Label className="text-sm font-medium">ความเร็วการเลื่อน</Label>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="text-xs text-muted-foreground whitespace-nowrap">ช้า</span>
+            <Slider
+              value={[speed]}
+              onValueChange={handleSpeedChange}
+              min={1}
+              max={100}
+              step={1}
+              className="flex-1"
+            />
+            <span className="text-xs text-muted-foreground whitespace-nowrap">เร็ว</span>
+          </div>
+          <p className="text-xs text-muted-foreground text-center">
+            ความเร็วปัจจุบัน: {speed}%
+          </p>
+        </div>
+
         {/* Add new message */}
         <div className="flex gap-2">
           <Input
