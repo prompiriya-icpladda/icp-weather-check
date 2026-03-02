@@ -14,9 +14,10 @@ export interface WeatherData {
   }[];
 }
 
-const SHEET_ID = "1qf0tEZeVw2u9PCLh9McipSIlfDxk2X-PvUZIXwrOc8U";
+const SHEET_ID = "1XDcGZ9uzkavDrwRQ3P3AhaooIoqNjWMNYku7SC0_ez0";
+const SHEET_GID = "964154175";
 // Using published CSV URL format (requires sheet to be published to web)
-const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
+const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${SHEET_GID}`;
 
 const parseCSVData = (csvText: string): WeatherData => {
   const lines = csvText.trim().split('\n');
