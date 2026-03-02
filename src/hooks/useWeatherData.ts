@@ -43,63 +43,47 @@ const parseCSVData = (csvText: string): WeatherData => {
     return result;
   };
 
-  // Structure based on the sheet:
-  // Row 0: Empty headers
-  // Row 1: Empty / labels row
-  // Row 2: Headers - Temp, RH, PM2.5, Temp Now, Humidity Now, Dust Now
-  // Row 3: Current values in columns F, G, H (indices 5, 6, 7)
-  // Row 4+: Historical data (Date, Time, Temp, RH, PM2.5)
+  // New structure: Timestamp, Pm1.0, Pm2.5, Pm10, Temperature, Humidity
+  // Row 0: Headers
+  // Row 1+: Data rows
   
   let currentTemp = 0;
   let currentHumidity = 0;
   let currentPM25 = 0;
   const history: WeatherData['history'] = [];
 
-  for (let i = 0; i < lines.length; i++) {
+  for (let i = 1; i < lines.length; i++) {
     const row = parseCSVLine(lines[i]);
     
-    // Find current values from "Temp Now", "Humidity Now", "Dust Now" columns (indices 6, 7, 8)
-    if (i >= 1 && i <= 4) {
-      const tempNow = parseFloat(row[6]);      // Temp Now (column G)
-      const humidityNow = parseFloat(row[7]);  // Humidity Now (column H)
-      const pm25Now = parseFloat(row[8]);      // Dust Now (column I)
-      
-      if (!isNaN(tempNow) && tempNow > 0) {
-        currentTemp = tempNow;
-        currentHumidity = humidityNow || 0;
-        currentPM25 = pm25Now || 0;
-      }
-    }
+    const timestamp = row[0] || '';
+    const pm25 = parseFloat(row[2]);       // Pm2.5 (column C)
+    const temp = parseFloat(row[4]);       // Temperature (column E)
+    const humidity = parseFloat(row[5]);   // Humidity (column F)
     
-    // Historical data - look for rows with date patterns
-    if (i >= 2) {
-      const dateVal = row[0] || '';
-      const timeVal = row[1] || '';
-      const temp = parseFloat(row[2]);
-      const humidity = parseFloat(row[3]);
-      const pm25 = parseFloat(row[4]);
-      
-      // Check if this looks like a data row (has date or time)
-      if ((dateVal.includes('/') || timeVal.includes(':')) && !isNaN(temp)) {
-        history.push({
-          date: dateVal,
-          time: timeVal,
-          temp: temp || 0,
-          humidity: humidity || 0,
-          pm25: Math.max(0, pm25 || 0), // Ensure non-negative
-        });
-        
-        // Limit to 50 records for performance
-        if (history.length >= 50) break;
-      }
-    }
+    if (isNaN(temp) || isNaN(humidity)) continue;
+
+    // Parse timestamp "2/3/2026, 15:52:50" -> date and time
+    const parts = timestamp.split(', ');
+    const dateVal = parts[0] || '';
+    const timeVal = parts[1] || '';
+
+    history.push({
+      date: dateVal,
+      time: timeVal,
+      temp: temp || 0,
+      humidity: humidity || 0,
+      pm25: Math.max(0, pm25 || 0),
+    });
+    
+    if (history.length >= 50) break;
   }
 
-  // If no current values found, use latest from history
-  if (currentTemp === 0 && history.length > 0) {
-    currentTemp = history[0].temp;
-    currentHumidity = history[0].humidity;
-    currentPM25 = history[0].pm25;
+  // Use the latest data row as current values
+  if (history.length > 0) {
+    const latest = history[history.length - 1];
+    currentTemp = latest.temp;
+    currentHumidity = latest.humidity;
+    currentPM25 = latest.pm25;
   }
 
   return {
