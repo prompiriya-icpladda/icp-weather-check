@@ -72,6 +72,10 @@ export const WeatherSidebar = () => {
             <span className={`text-sm px-3 py-1 rounded-full ${pm25Status.bg} ${pm25Status.color} font-medium inline-block mt-1`}>
               {pm25Status.label}
             </span>
+            <div className="flex gap-3 mt-2 text-sm text-muted-foreground">
+              <span>PM1.0: <strong className="text-foreground">{weatherData.currentPM1_0}</strong></span>
+              <span>PM10: <strong className="text-foreground">{weatherData.currentPM10}</strong></span>
+            </div>
           </div>
         </div>
       </div>

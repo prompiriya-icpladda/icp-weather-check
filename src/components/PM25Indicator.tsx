@@ -4,10 +4,12 @@ import { cn } from "@/lib/utils";
 
 interface PM25IndicatorProps {
   value: number;
+  pm10?: number;
+  pm1_0?: number;
   delay?: number;
 }
 
-export const PM25Indicator = ({ value, delay = 0 }: PM25IndicatorProps) => {
+export const PM25Indicator = ({ value, pm10, pm1_0, delay = 0 }: PM25IndicatorProps) => {
   const { level, color, description } = getPM25Level(value);
 
   const getColorClass = () => {
@@ -88,7 +90,7 @@ export const PM25Indicator = ({ value, delay = 0 }: PM25IndicatorProps) => {
               <Wind className="w-12 h-12 animate-pulse-soft" />
             </div>
              <span className="text-3xl md:text-4xl font-semibold text-muted-foreground uppercase tracking-wide">
-              ฝุ่น PM 2.5
+              คุณภาพอากาศ
             </span>
           </div>
           <div
@@ -103,9 +105,10 @@ export const PM25Indicator = ({ value, delay = 0 }: PM25IndicatorProps) => {
         </div>
 
         <div className="space-y-5">
+          {/* PM2.5 - Main value */}
           <div className="flex items-baseline gap-3">
              <span className={cn(
-               "text-8xl md:text-9xl font-bold tracking-tight",
+                "text-7xl md:text-8xl font-bold tracking-tight",
               color === "weather-pm-good" ? "text-weather-pm-good" :
               color === "weather-pm-moderate" ? "text-weather-pm-moderate" :
               color === "weather-pm-unhealthy" ? "text-weather-pm-unhealthy" :
@@ -114,14 +117,35 @@ export const PM25Indicator = ({ value, delay = 0 }: PM25IndicatorProps) => {
             )}>
               {value.toFixed(1)}
             </span>
-             <span className="text-5xl font-medium text-muted-foreground">
+             <span className="text-4xl font-medium text-muted-foreground">
               μg/m³
             </span>
+            <span className="text-2xl font-semibold text-muted-foreground ml-2">PM 2.5</span>
           </div>
+
+          {/* PM1.0 and PM10 sub-values */}
+          {(pm1_0 !== undefined || pm10 !== undefined) && (
+            <div className="flex gap-6 mt-2">
+              {pm1_0 !== undefined && (
+                <div className="flex items-baseline gap-2 bg-muted/30 rounded-xl px-4 py-3">
+                  <span className="text-lg font-semibold text-muted-foreground">PM 1.0</span>
+                  <span className="text-3xl font-bold text-foreground">{pm1_0.toFixed(0)}</span>
+                  <span className="text-sm text-muted-foreground">μg/m³</span>
+                </div>
+              )}
+              {pm10 !== undefined && (
+                <div className="flex items-baseline gap-2 bg-muted/30 rounded-xl px-4 py-3">
+                  <span className="text-lg font-semibold text-muted-foreground">PM 10</span>
+                  <span className="text-3xl font-bold text-foreground">{pm10.toFixed(0)}</span>
+                  <span className="text-sm text-muted-foreground">μg/m³</span>
+                </div>
+              )}
+            </div>
+          )}
 
            <p className="text-2xl text-muted-foreground">{description}</p>
 
-          {/* Enhanced Progress bar */}
+          {/* Progress bar */}
           <div className="space-y-3">
             <div className="h-5 w-full bg-muted/50 rounded-full overflow-hidden backdrop-blur-sm shadow-inner">
               <div

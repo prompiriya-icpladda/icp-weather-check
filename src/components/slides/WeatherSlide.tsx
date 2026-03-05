@@ -58,7 +58,7 @@ export const WeatherSlide = () => {
                 delay={300}
               />
 
-              <PM25Indicator value={weatherData.currentPM25} delay={400} />
+              <PM25Indicator value={weatherData.currentPM25} pm10={weatherData.currentPM10} pm1_0={weatherData.currentPM1_0} delay={400} />
             </div>
           )
         )}
