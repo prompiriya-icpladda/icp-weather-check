@@ -52,6 +52,8 @@ const parseCSVData = (csvText: string): WeatherData => {
   let currentPM25 = 0;
   const history: WeatherData['history'] = [];
 
+  const allRows: WeatherData['history'] = [];
+
   for (let i = 1; i < lines.length; i++) {
     const row = parseCSVLine(lines[i]);
     
@@ -67,16 +69,18 @@ const parseCSVData = (csvText: string): WeatherData => {
     const dateVal = parts[0] || '';
     const timeVal = parts[1] || '';
 
-    history.push({
+    allRows.push({
       date: dateVal,
       time: timeVal,
       temp: temp || 0,
       humidity: humidity || 0,
       pm25: Math.max(0, pm25 || 0),
     });
-    
-    if (history.length >= 50) break;
   }
+
+  // Keep only the last 50 rows (most recent data)
+  const recentRows = allRows.slice(-50);
+  history.push(...recentRows);
 
   // Use the latest data row as current values
   if (history.length > 0) {
