@@ -4,6 +4,8 @@ export interface WeatherData {
   currentTemp: number;
   currentHumidity: number;
   currentPM25: number;
+  currentPM10: number;
+  currentPM1_0: number;
   lastUpdate: Date;
   history: {
     date: string;
@@ -11,18 +13,18 @@ export interface WeatherData {
     temp: number;
     humidity: number;
     pm25: number;
+    pm10: number;
+    pm1_0: number;
   }[];
 }
 
 const SHEET_ID = "1XDcGZ9uzkavDrwRQ3P3AhaooIoqNjWMNYku7SC0_ez0";
 const SHEET_GID = "964154175";
-// Using published CSV URL format (requires sheet to be published to web)
 const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${SHEET_GID}`;
 
 const parseCSVData = (csvText: string): WeatherData => {
   const lines = csvText.trim().split('\n');
   
-  // Parse CSV lines - handle quoted values
   const parseCSVLine = (line: string): string[] => {
     const result: string[] = [];
     let current = '';
@@ -43,13 +45,12 @@ const parseCSVData = (csvText: string): WeatherData => {
     return result;
   };
 
-  // New structure: Timestamp, Pm1.0, Pm2.5, Pm10, Temperature, Humidity
-  // Row 0: Headers
-  // Row 1+: Data rows
-  
+  // Structure: Timestamp, Pm1.0, Pm2.5, Pm10, Temperature, Humidity
   let currentTemp = 0;
   let currentHumidity = 0;
   let currentPM25 = 0;
+  let currentPM10 = 0;
+  let currentPM1_0 = 0;
   const history: WeatherData['history'] = [];
 
   const allRows: WeatherData['history'] = [];
@@ -58,13 +59,14 @@ const parseCSVData = (csvText: string): WeatherData => {
     const row = parseCSVLine(lines[i]);
     
     const timestamp = row[0] || '';
+    const pm1_0 = parseFloat(row[1]);      // Pm1.0 (column B)
     const pm25 = parseFloat(row[2]);       // Pm2.5 (column C)
+    const pm10 = parseFloat(row[3]);       // Pm10 (column D)
     const temp = parseFloat(row[4]);       // Temperature (column E)
     const humidity = parseFloat(row[5]);   // Humidity (column F)
     
     if (isNaN(temp) || isNaN(humidity)) continue;
 
-    // Parse timestamp "2/3/2026, 15:52:50" -> date and time
     const parts = timestamp.split(', ');
     const dateVal = parts[0] || '';
     const timeVal = parts[1] || '';
@@ -75,25 +77,29 @@ const parseCSVData = (csvText: string): WeatherData => {
       temp: temp || 0,
       humidity: humidity || 0,
       pm25: Math.max(0, pm25 || 0),
+      pm10: Math.max(0, pm10 || 0),
+      pm1_0: Math.max(0, pm1_0 || 0),
     });
   }
 
-  // Keep only the last 50 rows (most recent data)
   const recentRows = allRows.slice(-50);
   history.push(...recentRows);
 
-  // Use the latest data row as current values
   if (history.length > 0) {
     const latest = history[history.length - 1];
     currentTemp = latest.temp;
     currentHumidity = latest.humidity;
     currentPM25 = latest.pm25;
+    currentPM10 = latest.pm10;
+    currentPM1_0 = latest.pm1_0;
   }
 
   return {
     currentTemp,
     currentHumidity,
     currentPM25,
+    currentPM10,
+    currentPM1_0,
     lastUpdate: new Date(),
     history,
   };
@@ -122,7 +128,7 @@ export const useWeatherData = () => {
         throw error;
       }
     },
-    refetchInterval: 30000, // Refetch every 30 seconds
+    refetchInterval: 30000,
     staleTime: 15000,
     retry: 3,
     retryDelay: 1000,
