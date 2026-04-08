@@ -29,46 +29,48 @@ export const WeatherSidebar = () => {
   const pm25Status = getPM25Status(weatherData.currentPM25);
 
   return (
-    <div className="h-full bg-gradient-to-b from-card/90 to-card/70 backdrop-blur-md border-l border-border/50 p-6 flex flex-col gap-6 overflow-hidden">
-      <h3 className="text-lg font-bold text-foreground uppercase tracking-wider">
+    <div className=" h-full  bg-gradient-to-b from-card/90 to-card/70 backdrop-blur-md border-l border-border/50  flex flex-col gap-6 overflow-hidden ">
+
+      <h3 className="rotate-90 text-lg font-bold text-foreground uppercase tracking-wider ">
         สภาพอากาศ
       </h3>
 
-      {/* Temperature */}
-      <div className="bg-background/50 rounded-2xl p-5 border border-border/30 flex-1 flex items-center">
+      <div className="rotate-90 flex gap-6">
+        {/* Temperature */}
+      <div className=" bg-background/50 rounded-xl p-3 border border-border/20 flex-1 flex items-center">
         <div className="flex items-center gap-4 w-full">
-          <div className="p-3 rounded-xl bg-weather-temp/20">
+          <div className="p-2 rounded-lg bg-weather-temp/20">
             <Thermometer className="h-8 w-8 text-weather-temp" />
           </div>
           <div className="flex-1">
             <p className="text-sm text-muted-foreground font-medium">อุณหภูมิ</p>
-            <p className="text-5xl font-bold leading-tight">{weatherData.currentTemp}°C</p>
+            <p className="text-3xl font-bold leading-tight">{weatherData.currentTemp}°C</p>
           </div>
         </div>
       </div>
 
       {/* Humidity */}
-      <div className="bg-background/50 rounded-2xl p-5 border border-border/30 flex-1 flex items-center">
+      <div className=" bg-background/50 rounded-2xl p-5 border border-border/30 flex-1 flex items-center">
         <div className="flex items-center gap-4 w-full">
           <div className="p-3 rounded-xl bg-weather-humidity/20">
             <Droplets className="h-8 w-8 text-weather-humidity" />
           </div>
           <div className="flex-1">
             <p className="text-sm text-muted-foreground font-medium">ความชื้น</p>
-            <p className="text-5xl font-bold leading-tight">{weatherData.currentHumidity}%</p>
+            <p className="text-3xl font-bold leading-tight">{weatherData.currentHumidity}%</p>
           </div>
         </div>
       </div>
 
       {/* PM2.5 */}
-      <div className="bg-background/50 rounded-2xl p-5 border border-border/30 flex-1 flex items-center">
+      <div className=" bg-background/50 rounded-xl p-5 border border-border/30 flex-1 flex items-center">
         <div className="flex items-center gap-4 w-full">
           <div className={`p-3 rounded-xl ${pm25Status.bg}`}>
             <Wind className={`h-8 w-8 ${pm25Status.color}`} />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm text-muted-foreground font-medium">PM 2.5</p>
-            <p className="text-5xl font-bold leading-tight">{weatherData.currentPM25}</p>
+            <p className="text-3xl font-bold leading-tight">{weatherData.currentPM25}</p>
             <span className={`text-sm px-3 py-1 rounded-full ${pm25Status.bg} ${pm25Status.color} font-medium inline-block mt-1`}>
               {pm25Status.label}
             </span>
@@ -79,9 +81,10 @@ export const WeatherSidebar = () => {
           </div>
         </div>
       </div>
+      </div>
 
       {/* Last Update */}
-      <div className="pt-4 border-t border-border/30">
+      <div className="rotate-90 pt-[220px] border-t border-border/30">
         <p className="text-sm text-muted-foreground text-center">
           อัพเดท: {weatherData.lastUpdate instanceof Date 
             ? weatherData.lastUpdate.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })

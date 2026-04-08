@@ -85,7 +85,7 @@ export const SlideShow = () => {
 
   if (isLoading) {
     return (
-      <div className="h-screen flex items-center justify-center bg-background">
+      <div className="rotate-90 h-screen flex items-center justify-center bg-background">
         <div className="text-center">
           <motion.div
             animate={{ rotate: 360 }}
@@ -131,7 +131,7 @@ export const SlideShow = () => {
       {/* Settings button */}
       <Link 
         to="/settings" 
-        className="absolute top-4 z-50 opacity-30 hover:opacity-100 transition-opacity"
+        className="absolute top-[600px] z-50 opacity-30 hover:opacity-100 transition-opacity"
         style={{ right: showWeatherSidebar ? "17rem" : "1rem" }}
       >
         <Button variant="outline" size="icon">

@@ -12,9 +12,9 @@ export const AnnouncementSlide = ({ title, content, fileUrl, fileType }: Announc
   if (fileUrl) {
     if (fileType === "pdf") {
       return (
-        <div className="h-full w-full flex flex-col bg-gradient-to-br from-primary/5 via-background to-secondary/5">
+        <div className="rotate-90 h-[1000px] w-[1000px] flex flex-col bg-gradient-to-br from-primary/5 via-background to-secondary/5 relative bottom-40">
           {/* Compact header for PDF */}
-          <div className="bg-card/80 backdrop-blur-sm border-b border-border px-4 py-2 flex items-center gap-3 shrink-0">
+          <div className="bg-card/80 backdrop-blur-sm border-b border-border px-40 py-2 flex items-center gap-3 shrink-0">
             <div className="p-2 rounded-full bg-primary/20">
               <FileText className="h-5 w-5 text-primary" />
             </div>
@@ -36,15 +36,15 @@ export const AnnouncementSlide = ({ title, content, fileUrl, fileType }: Announc
 
     // Image display - maximize image size
     return (
-      <div className="h-full w-full flex flex-col bg-gradient-to-br from-primary/5 via-background to-secondary/5">
+      <div className="rotate-90 h-[1000px] flex flex-col bg-gradient-to-br from-primary/5 via-background to-secondary/5">
         {/* Compact header for image */}
-        <div className="bg-card/80 backdrop-blur-sm border-b border-border px-4 py-2 flex items-center justify-center shrink-0">
+        <div className="bg-card/80 backdrop-blur-sm border-b border-border px-10 py-2 flex items-center justify-start shrink-0">
           <h1 className="text-xl font-bold text-foreground text-center truncate">
             {title}
           </h1>
         </div>
         {/* Maximize image space */}
-        <div className="flex-1 flex items-center justify-center p-4 min-h-0">
+        <div className="flex-1 flex items-center justify-center min-h-0 px-0 relative right-40">
           <img
             src={fileUrl}
             alt={title}
@@ -52,7 +52,7 @@ export const AnnouncementSlide = ({ title, content, fileUrl, fileType }: Announc
           />
         </div>
         {content && (
-          <div className="bg-card/60 backdrop-blur-sm border-t border-border px-4 py-2 shrink-0">
+          <div className="bg-card/60 backdrop-blur-sm border-t border-border px- py-2 shrink-0">
             <p className="text-base text-muted-foreground text-center truncate">
               {content}
             </p>
