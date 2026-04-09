@@ -25,7 +25,8 @@ export const WeatherSlide = () => {
   }
 
   return (
-    <div className="rotate-90 h-[1080px]  bg-background p-0 overflow-hidden px-[120px]">
+    <div className="w-screen h-screen overflow-hidden bg-background flex items-center justify-center">
+    <div className="rotate-90 bg-background relative">
       {/* Date/Time Display - Large */}
       <div className="mb-0">
         <DateTimeDisplay
@@ -41,7 +42,7 @@ export const WeatherSlide = () => {
           <LoadingSkeleton />
         ) : (
           weatherData && (
-            <div className="flex flex-col md:grid-cols-1 gap-6 h-[full] w-[60%]">
+            <div className="flex flex-col  gap-6 h-full w-full">
               <WeatherStatus
                 temp={weatherData.currentTemp}
                 humidity={weatherData.currentHumidity}
@@ -63,6 +64,7 @@ export const WeatherSlide = () => {
           )
         )}
       </div>
+    </div>
     </div>
   );
 };

@@ -7,7 +7,7 @@ export const WeatherSidebar = () => {
 
   if (isLoading) {
     return (
-      <div className="h-full bg-card/80 backdrop-blur-sm border-l border-border p-6 flex flex-col gap-6">
+      <div className="h-full bg-card/80 backdrop-blur-sm border-l border-border p-6 flex gap-10 flex-col">
         <Skeleton className="h-8 w-32" />
         <Skeleton className="h-32 w-full" />
         <Skeleton className="h-32 w-full" />
@@ -29,11 +29,13 @@ export const WeatherSidebar = () => {
   const pm25Status = getPM25Status(weatherData.currentPM25);
 
   return (
-    <div className=" h-full  bg-gradient-to-b from-card/90 to-card/70 backdrop-blur-md border-l border-border/50  flex flex-col gap-6 overflow-hidden ">
+    <div className=" h-full  justify-center bg-gradient-to-b from-card/90 to-card/70 backdrop-blur-md border-l border-border/50  flex overflow-hidden ">
 
-      <h3 className="rotate-90 text-lg font-bold text-foreground uppercase tracking-wider ">
-        สภาพอากาศ
-      </h3>
+      <div className="">
+        <h3 className="rotate-90 text-xl font-bold text-foreground uppercase tracking-wider ">
+          สภาพอากาศ
+        </h3>
+      </div>
 
       <div className="rotate-90 flex gap-6">
         {/* Temperature */}

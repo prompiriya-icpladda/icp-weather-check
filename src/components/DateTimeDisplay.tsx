@@ -32,9 +32,9 @@ export const DateTimeDisplay = ({ lastUpdate, humidity, isLoading }: DateTimeDis
 
   return (
     <div className="opacity-0 animate-fade-in relative" style={{ animationDelay: "100ms" }}>
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="flex flex-col gap-10">
         <div className="space-y-2">
-          <div className="flex items-center gap-3 text-muted-foreground">
+          <div className="flex items-start gap-3 text-muted-foreground">
             <div className="p-2 rounded-xl bg-primary/10">
               <Calendar className="w-7 h-7 text-primary" />
             </div>
@@ -56,7 +56,7 @@ export const DateTimeDisplay = ({ lastUpdate, humidity, isLoading }: DateTimeDis
         </div>
 
         {(lastUpdate || typeof humidity === "number") && (
-          <div className="px-5 py-4 rounded-2xl bg-muted/50 backdrop-blur-sm">
+          <div className="px-5 py-0 rounded-2xl bg-muted/50 backdrop-blur-sm">
             {lastUpdate && (
               <div className="flex items-center gap-3">
                 <RefreshCw

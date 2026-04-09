@@ -127,12 +127,12 @@ export const SlideShow = () => {
   const variants = slideVariants[transitionType];
 
   return (
-    <div className="h-screen flex flex-col bg-background relative overflow-hidden">
+    <div className="h-[100vh] flex flex-col bg-background overflow-hidden">
       {/* Settings button */}
       <Link 
         to="/settings" 
-        className="absolute top-[600px] z-50 opacity-30 hover:opacity-100 transition-opacity"
-        style={{ right: showWeatherSidebar ? "17rem" : "1rem" }}
+        className="absolute z-50 opacity-30 hover:opacity-100 transition-opacity"
+        style={{ right: showWeatherSidebar ? "1rem" : "1rem" }}
       >
         <Button variant="outline" size="icon">
           <Settings className="h-4 w-4" />
